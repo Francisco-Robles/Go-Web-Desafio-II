@@ -78,7 +78,7 @@ func (dh *DentistHandler) Patch(c *gin.Context) {
 		return
 	}
 
-	dentistBack, err := dh.DentistService.GetById(id)
+	targetDentist, err := dh.DentistService.GetById(id)
 	if err != nil {
 		web.NewNotFoundApiError("dentist not found.")
 		return
@@ -94,23 +94,23 @@ func (dh *DentistHandler) Patch(c *gin.Context) {
 	if r.Name == "" {
 		if r.Surname == "" {
 			update = domain.Dentist{
-				Name:    dentistBack.Name,
-				Surname: dentistBack.Surname,
+				Name:    targetDentist.Name,
+				Surname: targetDentist.Surname,
 				License: r.License,
 			}
 		}else{
 			update = domain.Dentist{
-				Name:    dentistBack.Name,
+				Name:    targetDentist.Name,
 				Surname: r.Surname,
-				License: dentistBack.License,
+				License: targetDentist.License,
 			}
 		}
 
 	}else{
 		update = domain.Dentist{
 			Name:    r.Name,
-			Surname: dentistBack.Surname,
-			License: dentistBack.License,
+			Surname: targetDentist.Surname,
+			License: targetDentist.License,
 		}
 	}
 

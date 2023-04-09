@@ -5,7 +5,9 @@ import (
 
 	"github.com/Francisco-Robles/Go-Web-Desafio-II/cmd/server/handlers"
 	"github.com/Francisco-Robles/Go-Web-Desafio-II/internal/layers/dentist"
+	"github.com/Francisco-Robles/Go-Web-Desafio-II/internal/layers/patient"
 	dentiststore "github.com/Francisco-Robles/Go-Web-Desafio-II/pkg/stores/dentist_store"
+	patientstore "github.com/Francisco-Robles/Go-Web-Desafio-II/pkg/stores/patient_store"
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -22,10 +24,15 @@ func main() {
 		panic(errPing)
 	}
 
-	dentistStorage := dentiststore.DentistSqlStore{db}
-	dentistRepo := dentist.DentistRepository{&dentistStorage}
-	dentistService := dentist.DentistService{&dentistRepo}
-	dentistHandler := handlers.DentistHandler{&dentistService}
+	dentistStorage := dentiststore.DentistSqlStore{DB: db}
+	dentistRepo := dentist.DentistRepository{Store: &dentistStorage}
+	dentistService := dentist.DentistService{Repository: &dentistRepo}
+	dentistHandler := handlers.DentistHandler{DentistService: &dentistService}
+
+	patientStorage := patientstore.PatientSqlStore{DB: db}
+	patientRepo := patient.PatientRepository{Store: &patientStorage}
+	patientService := patient.PatientService{Repository: &patientRepo}
+	patientHandler := handlers.PatientHandler{PatientService: &patientService}
 
 	r := gin.Default()
 
@@ -38,6 +45,16 @@ func main() {
 		dentists.PUT(":id", dentistHandler.Put)
 		dentists.DELETE(":id", dentistHandler.Delete)
 
+	}
+
+	patients := r.Group("patients")
+	{
+		patients.POST("", patientHandler.Post)
+		patients.GET("", patientHandler.GetAll)
+		patients.GET(":id", patientHandler.GetById)
+		patients.PATCH(":id", patientHandler.Patch)
+		patients.PUT(":id", patientHandler.Put)
+		patients.DELETE(":id", patientHandler.Delete)
 	}
 
 	r.Run()

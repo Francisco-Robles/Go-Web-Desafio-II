@@ -30,7 +30,7 @@ func (s *DentistSqlStore) GetById(id int) (*domain.Dentist, error) {
 
 	var dentist domain.Dentist
 
-	query := "SELECT * FROM dentists WHERE id = ?"
+	query := "SELECT * FROM dentists WHERE id = ?;"
 	row := s.DB.QueryRow(query, id)
 
 	err := row.Scan(&dentist.Id, &dentist.Name, &dentist.Surname, &dentist.License)
@@ -45,7 +45,7 @@ func (s *DentistSqlStore) GetAll() ([]domain.Dentist, error) {
 
 	var dentists []domain.Dentist
 
-	query := "SELECT * FROM dentists"
+	query := "SELECT * FROM dentists;"
 	rows, err := s.DB.Query(query)
 	if err != nil {
 		return nil, err
@@ -77,7 +77,7 @@ func (s *DentistSqlStore) UpdateOne(id int, d domain.Dentist) (*domain.Dentist, 
 
 	var dentist domain.Dentist
 
-	query := "UPDATE dentists SET name = ?, surname = ?, license = ? WHERE id = ?"
+	query := "UPDATE dentists SET name = ?, surname = ?, license = ? WHERE id = ?;"
 	row := s.DB.QueryRow(query, d.Name, d.Surname, d.License, id)
 
 	err := row.Scan(&dentist.Id, &dentist.Name, &dentist.Surname, &dentist.License)
@@ -93,7 +93,7 @@ func (s *DentistSqlStore) UpdateMany(id int, d domain.Dentist) (*domain.Dentist,
 
 	var dentist domain.Dentist
 
-	query := "UPDATE dentists SET name = ?, surname = ?, license = ? WHERE id = ?"
+	query := "UPDATE dentists SET name = ?, surname = ?, license = ? WHERE id = ?;"
 	row := s.DB.QueryRow(query, d.Name, d.Surname, d.License, id)
 
 	err := row.Scan(&dentist.Id, &dentist.Name, &dentist.Surname, &dentist.License)
