@@ -9,4 +9,5 @@ type PatientStoreInterface interface {
 	UpdateOne(id int, p domain.Patient) (*domain.Patient, error)
 	UpdateMany(id int, p domain.Patient) (*domain.Patient, error)
 	Delete(id int) error
+	GetIdByDni(dni string) (int, error)
 }

@@ -9,4 +9,5 @@ type DentistStoreInterface interface {
 	UpdateOne(id int, d domain.Dentist) (*domain.Dentist, error)
 	UpdateMany(id int, d domain.Dentist) (*domain.Dentist, error)
 	Delete(id int) error
+	GetIdByLicense(license string) (int, error)
 }

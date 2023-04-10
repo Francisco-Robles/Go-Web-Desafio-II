@@ -118,3 +118,19 @@ func (s *PatientSqlStore) Delete(id int) error {
 	return nil
 
 }
+
+func (s *PatientSqlStore) GetIdByDni (dni string) (int, error) {
+
+	var id int
+
+	query := "SELECT id FROM patients WHERE dni = ?"
+	result := s.DB.QueryRow(query, dni)
+
+	err := result.Scan(&id)
+	if err != nil {
+		return -1, err
+	}
+
+	return id, nil
+
+}

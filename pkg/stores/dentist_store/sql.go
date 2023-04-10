@@ -2,6 +2,7 @@ package dentiststore
 
 import (
 	"database/sql"
+	"fmt"
 
 	"github.com/Francisco-Robles/Go-Web-Desafio-II/internal/domain"
 )
@@ -115,5 +116,22 @@ func (s *DentistSqlStore) Delete(id int) error {
 	}
 
 	return nil
+
+}
+
+func (s *DentistSqlStore) GetIdByLicense(license string) (int, error) {
+
+	var id int
+
+	query := "SELECT id FROM dentists WHERE license = ?"
+	row := s.DB.QueryRow(query, license)
+
+	err := row.Scan(&id)
+	fmt.Println(err)
+	if err != nil {
+		return -1, err
+	}
+
+	return id, nil
 
 }
