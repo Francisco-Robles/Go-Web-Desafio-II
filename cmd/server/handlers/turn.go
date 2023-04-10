@@ -21,13 +21,13 @@ func (th *TurnHandler) Post(c * gin.Context) {
 
 	err := c.ShouldBindJSON(&turn)
 	if err != nil {
-		web.NewBadRequestApiError("invalid JSON.")
+		web.NewApiError(c, http.StatusBadRequest,"bad_request", "invalid JSON")
 		return
 	}
 
 	t, err := th.TurnService.Create(turn)
 	if err != nil {
-		web.NewBadRequestApiError(err.Error())
+		web.NewApiError(c, http.StatusBadRequest,"bad_request", err.Error())
 		return
 	}
 
@@ -40,13 +40,13 @@ func (th *TurnHandler) GetById(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
-		web.NewBadRequestApiError("invalid id")
+		web.NewApiError(c, http.StatusBadRequest,"bad_request", "invalid id")
 		return
 	}
 
 	turn, err := th.TurnService.GetById(id)
 	if err != nil {
-		web.NewNotFoundApiError("turn not found.")
+		web.NewApiError(c, http.StatusNotFound,"not_found", "turn not found")
 		return
 	}
 
@@ -58,7 +58,7 @@ func (th *TurnHandler) GetAll(c *gin.Context) {
 
 	turns, err := th.TurnService.GetAll()
 	if err != nil {
-		web.NewBadRequestApiError(err.Error())
+		web.NewApiError(c, http.StatusBadRequest,"bad_request", err.Error())
 		return
 	}
 
@@ -78,18 +78,18 @@ func (th *TurnHandler) Patch(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
-		web.NewBadRequestApiError("invalid id.")
+		web.NewApiError(c, http.StatusBadRequest,"bad_request", "invalid id")
 		return
 	}
 
 	update, err := th.TurnService.GetById(id)
 	if err != nil {
-		web.NewNotFoundApiError("turn not found.")
+		web.NewApiError(c, http.StatusNotFound,"not_found", "turn not found")
 		return
 	}
 
 	if err := c.ShouldBindJSON(&r); err != nil {
-		web.NewBadRequestApiError("invalid JSON.")
+		web.NewApiError(c, http.StatusBadRequest,"bad_request", "invalid JSON")
 		return
 	}
 
@@ -107,7 +107,7 @@ func (th *TurnHandler) Patch(c *gin.Context) {
 
 	t, err := th.TurnService.UpdateOne(id, *update)
 	if err != nil {
-		web.NewConflictApiError(err.Error())
+		web.NewApiError(c, http.StatusConflict,"conflict", err.Error())
 		return
 	}
 
@@ -121,25 +121,25 @@ func (th *TurnHandler) Put(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
-		web.NewBadRequestApiError("invalid id.")
+		web.NewApiError(c, http.StatusBadRequest,"bad_request", "invalid id")
 		return
 	}
 
 	_, err = th.TurnService.GetById(id)
 	if err != nil {
-		web.NewNotFoundApiError("turn not found.")
+		web.NewApiError(c, http.StatusNotFound,"not_found", "turn not found")
 		return
 	}
 
 	err = c.ShouldBindJSON(&turn)
 	if err != nil {
-		web.NewBadRequestApiError("invalid JSON.")
+		web.NewApiError(c, http.StatusBadRequest,"bad_request", "invalid JSON")
 		return
 	}
 
 	t, err := th.TurnService.UpdateMany(id, turn)
 	if err != nil {
-		web.NewConflictApiError(err.Error())
+		web.NewApiError(c, http.StatusConflict,"conflict", err.Error())
 		return
 	}
 
@@ -152,19 +152,19 @@ func (th *TurnHandler) Delete(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
-		web.NewBadRequestApiError("invalid id.")
+		web.NewApiError(c, http.StatusBadRequest,"bad_request", "invalid id")
 		return
 	}
 
 	_, err = th.TurnService.GetById(id)
 	if err != nil {
-		web.NewNotFoundApiError("turn not found.")
+		web.NewApiError(c, http.StatusNotFound,"not_found", "turn not found")
 		return
 	}
 
 	err = th.TurnService.Delete(id)
 	if err != nil {
-		web.NewBadRequestApiError(err.Error())
+		web.NewApiError(c, http.StatusBadRequest,"bad_request", err.Error())
 		return
 	}
 
@@ -179,13 +179,13 @@ func (th *TurnHandler) PostByPatientDniAndDentistLicense(c *gin.Context) {
 	var turn domain.Turn
 	err := c.ShouldBindJSON(&turn)
 	if err != nil {
-		web.NewBadRequestApiError("invalid JSON.")
+		web.NewApiError(c, http.StatusBadRequest,"bad_request", "invalid JSON")
 		return
 	}
 
 	t, err := th.TurnService.CreateByPatientDniAndDentistLicense(turn, dni, license)
 	if err != nil {
-		web.NewBadRequestApiError(err.Error())
+		web.NewApiError(c, http.StatusBadRequest,"bad_request", err.Error())
 		return
 	}
 	web.Success(c, http.StatusCreated, t)
@@ -198,7 +198,7 @@ func (th *TurnHandler) GetByPatientDni(c *gin.Context) {
 
 	turn, err := th.TurnService.GetByPatientDni(dni)
 	if err != nil {
-		web.NewBadRequestApiError(err.Error())
+		web.NewApiError(c, http.StatusBadRequest,"bad_request", err.Error())
 		return
 	}
 

@@ -20,12 +20,12 @@ func (ph *PatientHandler) Post(c *gin.Context) {
 
 	err := c.ShouldBindJSON(&patient)
 	if err != nil {
-		web.NewBadRequestApiError("invalid JSON")
+		web.NewApiError(c, http.StatusBadRequest,"bad_request", "invalid JSON")
 	}
 
 	p, err := ph.PatientService.Create(patient)
 	if err != nil {
-		web.NewBadRequestApiError(err.Error())
+		web.NewApiError(c, http.StatusBadRequest,"bad_request", err.Error())
 	}
 
 	web.Success(c, http.StatusCreated, p)
@@ -37,13 +37,13 @@ func (ph *PatientHandler) GetById(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
-		web.NewBadRequestApiError("invalid id.")
+		web.NewApiError(c, http.StatusBadRequest,"bad_request", "invalid id")
 		return
 	}
 
 	patient, err := ph.PatientService.GetById(id)
 	if err != nil {
-		web.NewNotFoundApiError("user not found.")
+		web.NewApiError(c, http.StatusNotFound,"not_found", "patient not found")
 		return
 	}
 
@@ -55,7 +55,7 @@ func (ph *PatientHandler) GetAll(c *gin.Context) {
 
 	patients, err := ph.PatientService.GetAll()
 	if err != nil {
-		web.NewBadRequestApiError(err.Error())
+		web.NewApiError(c, http.StatusBadRequest,"bad_request", err.Error())
 	}
 
 	web.Success(c, http.StatusOK, patients)
@@ -76,19 +76,19 @@ func (ph *PatientHandler) Patch(c * gin.Context){
 	idParam := c.Param("id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
-		web.NewBadRequestApiError("invalid id")
+		web.NewApiError(c, http.StatusBadRequest,"bad_request", "invalid id")
 		return
 	}
 
 	update, err := ph.PatientService.GetById(id)
 	if err != nil {
-		web.NewNotFoundApiError("dentist not found.")
+		web.NewApiError(c, http.StatusNotFound,"not_found", "patient not found")
 		return
 	}
 
 	err = c.ShouldBindJSON(&r)
 	if err != nil {
-		web.NewBadRequestApiError("invalid JSON")
+		web.NewApiError(c, http.StatusBadRequest,"bad_request", "invalid JSON")
 		return
 	}
 
@@ -114,7 +114,7 @@ func (ph *PatientHandler) Patch(c * gin.Context){
 
 	result, err := ph.PatientService.UpdateOne(id, *update)
 	if err != nil {
-		web.NewConflictApiError(err.Error())
+		web.NewApiError(c, http.StatusConflict,"conflict", err.Error())
 		return
 	}
 
@@ -128,25 +128,25 @@ func (ph *PatientHandler) Put (c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
-		web.NewBadRequestApiError("invalid id.")
+		web.NewApiError(c, http.StatusBadRequest,"bad_request", "invalid id")
 		return
 	}
 
 	_, err = ph.PatientService.GetById(id)
 	if err != nil {
-		web.NewNotFoundApiError("patient not found.")
+		web.NewApiError(c, http.StatusNotFound,"not_found", "patient not found")
 		return
 	}
 
 	err = c.ShouldBindJSON(&patient)
 	if err != nil {
-		web.NewBadRequestApiError("invalid JSON.")
+		web.NewApiError(c, http.StatusBadRequest,"bad_request", "invalid JSON")
 		return
 	}
 
 	p, err := ph.PatientService.UpdateMany(id, patient)
 	if err != nil {
-		web.NewConflictApiError(err.Error())
+		web.NewApiError(c, http.StatusConflict,"conflict", err.Error())
 		return
 	}
 
@@ -159,19 +159,19 @@ func (ph *PatientHandler) Delete(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
-		web.NewBadRequestApiError("invalid id.")
+		web.NewApiError(c, http.StatusBadRequest,"bad_request", "invalid id")
 		return
 	}
 
 	_, err = ph.PatientService.GetById(id)
 	if err != nil {
-		web.NewNotFoundApiError("patient not found.")
+		web.NewApiError(c, http.StatusNotFound,"not_found", "patient not found")
 		return
 	}
 
 	err = ph.PatientService.Delete(id)
 	if err != nil {
-		web.NewBadRequestApiError(err.Error())
+		web.NewApiError(c, http.StatusBadRequest,"bad_request", err.Error())
 		return
 	}
 

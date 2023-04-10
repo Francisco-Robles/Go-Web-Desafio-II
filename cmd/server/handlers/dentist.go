@@ -20,12 +20,12 @@ func (dh *DentistHandler) Post(c *gin.Context) {
 
 	err := c.ShouldBindJSON(&dentist)
 	if err != nil {
-		web.NewBadRequestApiError("invalid JSON")
+		web.NewApiError(c, http.StatusBadRequest, "bad_request", "invalid JSON")
 	}
 
 	d, err := dh.DentistService.Create(dentist)
 	if err != nil {
-		web.NewBadRequestApiError(err.Error())
+		web.NewApiError(c, http.StatusBadRequest, "bad_request", err.Error())
 	}
 
 	web.Success(c, http.StatusCreated, d)
@@ -37,13 +37,13 @@ func (dh *DentistHandler) GetById(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
-		web.NewBadRequestApiError("invalid id.")
+		web.NewApiError(c, http.StatusBadRequest, "bad_request", "invalid id")
 		return
 	}
 
 	dentist, err := dh.DentistService.GetById(id)
 	if err != nil {
-		web.NewBadRequestApiError("dentist not found.")
+		web.NewApiError(c, http.StatusNotFound, "not_found", "dentist not found")
 		return
 	}
 
@@ -55,7 +55,7 @@ func (dh *DentistHandler) GetAll(c *gin.Context) {
 
 	dentists, err := dh.DentistService.GetAll()
 	if err != nil {
-		web.NewBadRequestApiError(err.Error())
+		web.NewApiError(c, http.StatusBadRequest, "bad_request", err.Error())
 	}
 
 	web.Success(c, http.StatusOK, dentists)
@@ -74,39 +74,24 @@ func (dh *DentistHandler) Patch(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
-		web.NewBadRequestApiError("invalid id.")
+		web.NewApiError(c, http.StatusBadRequest,"bad_request", "invalid id")
 		return
 	}
 
 	targetDentist, err := dh.DentistService.GetById(id)
 	if err != nil {
-		web.NewNotFoundApiError("dentist not found.")
+		web.NewApiError(c, http.StatusNotFound,"not_found", "dentist not found")
 		return
 	}
 
 	if err := c.ShouldBindJSON(&r); err != nil {
-		web.NewBadRequestApiError("invalid JSON.")
+		web.NewApiError(c, http.StatusBadRequest,"bad_request", "invalid JSON")
 		return
 	}
 
 	var update domain.Dentist
 
-	if r.Name == "" {
-		if r.Surname == "" {
-			update = domain.Dentist{
-				Name:    targetDentist.Name,
-				Surname: targetDentist.Surname,
-				License: r.License,
-			}
-		}else{
-			update = domain.Dentist{
-				Name:    targetDentist.Name,
-				Surname: r.Surname,
-				License: targetDentist.License,
-			}
-		}
-
-	}else{
+	if r.Name != "" {
 		update = domain.Dentist{
 			Name:    r.Name,
 			Surname: targetDentist.Surname,
@@ -114,9 +99,25 @@ func (dh *DentistHandler) Patch(c *gin.Context) {
 		}
 	}
 
+	if r.Surname != "" {
+		update = domain.Dentist{
+			Name:    targetDentist.Name,
+			Surname: r.Surname,
+			License: targetDentist.License,
+		}
+	}
+
+	if r.License != "" {
+		update = domain.Dentist{
+			Name:    targetDentist.Name,
+			Surname: targetDentist.Surname,
+			License: r.License,
+		}
+	}
+	
 	d, err := dh.DentistService.UpdateOne(id, update)
 	if err != nil {
-		web.NewConflictApiError(err.Error())
+		web.NewApiError(c, http.StatusConflict,"conflict", err.Error())
 		return
 	}
 
@@ -129,26 +130,26 @@ func (dh *DentistHandler) Put(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
-		web.NewBadRequestApiError("invalid id.")
+		web.NewApiError(c, http.StatusBadRequest,"bad_request", "invalid id")
 		return
 	}
 
 	_, err = dh.DentistService.GetById(id)
 	if err != nil {
-		web.NewNotFoundApiError("dentist not found.")
+		web.NewApiError(c, http.StatusNotFound,"not_found", "dentist not found")
 		return
 	}
 
 	var dentist domain.Dentist
 	err = c.ShouldBindJSON(&dentist)
 	if err != nil {
-		web.NewBadRequestApiError("invalid JSON.")
+		web.NewApiError(c, http.StatusBadRequest,"bad_request", "invalid JSON")
 		return
 	}
 
 	d, err := dh.DentistService.UpdateMany(id, dentist)
 	if err != nil {
-		web.NewConflictApiError(err.Error())
+		web.NewApiError(c, http.StatusConflict,"conflict", err.Error())
 		return
 	}
 
@@ -161,13 +162,13 @@ func (dh *DentistHandler) Delete(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
-		web.NewBadRequestApiError("invalid id.")
+		web.NewApiError(c, http.StatusBadRequest,"bad_request", "invalid id")
 		return
 	}
 
 	err = dh.DentistService.Delete(id)
 	if err != nil {
-		web.NewNotFoundApiError("dentist not found.")
+		web.NewApiError(c, http.StatusNotFound,"not_found", "dentist not found")
 	}
 
 	web.Success(c, http.StatusOK, nil)
