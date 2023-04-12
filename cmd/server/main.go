@@ -7,14 +7,20 @@ import (
 	"github.com/Francisco-Robles/Go-Web-Desafio-II/internal/layers/dentist"
 	"github.com/Francisco-Robles/Go-Web-Desafio-II/internal/layers/patient"
 	"github.com/Francisco-Robles/Go-Web-Desafio-II/internal/layers/turn"
+	"github.com/Francisco-Robles/Go-Web-Desafio-II/pkg/middleware"
 	dentiststore "github.com/Francisco-Robles/Go-Web-Desafio-II/pkg/stores/dentist_store"
 	patientstore "github.com/Francisco-Robles/Go-Web-Desafio-II/pkg/stores/patient_store"
 	turnstore "github.com/Francisco-Robles/Go-Web-Desafio-II/pkg/stores/turn_store"
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/joho/godotenv"
 )
 
 func main() {
+
+	if err := godotenv.Load("./.env"); err != nil {
+		panic("Error loading .env file: " + err.Error())
+	}
 
 	db, err := sql.Open("mysql", "root:elescuadron10@tcp(localhost:3306)/desafio_II")
 	if err != nil {
@@ -41,7 +47,8 @@ func main() {
 	turnService := turn.TurnService{Repository: &turnRepo}
 	turnHandler := handlers.TurnHandler{TurnService: &turnService}
 	
-	r := gin.Default()
+	r := gin.New()
+	r.Use(gin.Recovery(), middleware.Authentication(), middleware.Logger())
 
 	dentists := r.Group("dentists")
 	{
