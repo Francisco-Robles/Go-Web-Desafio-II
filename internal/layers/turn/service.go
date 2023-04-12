@@ -7,13 +7,14 @@ import (
 
 type ITurnService interface {
 	Create(t domain.Turn) (*domain.Turn, error)
-	GetById(id int) (*domain.Turn, error)
+	GetById(id int) (*domain.TurnDTO, error)
+	FindById(id int) (*domain.Turn, error)
 	GetAll() ([]domain.Turn, error)
 	UpdateOne(id int, t domain.Turn) (*domain.Turn, error)
 	UpdateMany(id int, t domain.Turn) (*domain.Turn, error)
 	Delete(id int) error
 	CreateByPatientDniAndDentistLicense(t domain.Turn, dni string, license string) (*domain.Turn, error)
-	GetByPatientDni(dni string) (*domain.Turn, error)
+	GetByPatientDni(dni string) (*domain.TurnDTO, error)
 }
 
 type TurnService struct {
@@ -31,9 +32,20 @@ func (ts *TurnService) Create(t domain.Turn) (*domain.Turn, error) {
 
 }
 
-func (ts *TurnService) GetById(id int) (*domain.Turn, error) {
+func (ts *TurnService) GetById(id int) (*domain.TurnDTO, error) {
 
 	turn, err := ts.Repository.GetById(id)
+	if err != nil {
+		return nil, err
+	}
+
+	return turn, nil
+
+}
+
+func (ts *TurnService) FindById(id int) (*domain.Turn, error) {
+
+	turn, err := ts.Repository.FindById(id)
 	if err != nil {
 		return nil, err
 	}
@@ -96,7 +108,7 @@ func (ts *TurnService) CreateByPatientDniAndDentistLicense(t domain.Turn, dni st
 
 }
 
-func (ts *TurnService) GetByPatientDni(dni string) (*domain.Turn, error) {
+func (ts *TurnService) GetByPatientDni(dni string) (*domain.TurnDTO, error) {
 
 	turn, err := ts.Repository.GetByPatientDni(dni)
 	if err != nil {

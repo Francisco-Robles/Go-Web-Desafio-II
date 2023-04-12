@@ -8,13 +8,14 @@ import (
 
 type ITurnRepository interface {
 	Create(t domain.Turn) (*domain.Turn, error)
-	GetById(id int) (*domain.Turn, error)
+	GetById(id int) (*domain.TurnDTO, error)
+	FindById(id int)  (*domain.Turn, error)
 	GetAll() ([]domain.Turn, error)
 	UpdateOne(id int, t domain.Turn) (*domain.Turn, error)
 	UpdateMany(id int, t domain.Turn) (*domain.Turn, error)
 	Delete(id int) error
 	CreateByPatientDniAndDentistLicense(t domain.Turn, dni string, license string) (*domain.Turn, error)
-	GetByPatientDni(dni string) (*domain.Turn, error)
+	GetByPatientDni(dni string) (*domain.TurnDTO, error)
 }
 
 type TurnRepository struct {
@@ -32,9 +33,20 @@ func (tr *TurnRepository) Create(t domain.Turn) (*domain.Turn, error) {
 
 }
 
-func (tr *TurnRepository) GetById(id int) (*domain.Turn, error) {
+func (tr *TurnRepository) GetById(id int) (*domain.TurnDTO, error) {
 
 	turn, err := tr.Store.GetById(id)
+	if err != nil {
+		return nil, err
+	}
+
+	return turn, nil
+
+}
+
+func (tr *TurnRepository) FindById(id int) (*domain.Turn, error) {
+
+	turn, err := tr.Store.FindById(id)
 	if err != nil {
 		return nil, err
 	}
@@ -97,7 +109,7 @@ func (tr *TurnRepository) CreateByPatientDniAndDentistLicense(t domain.Turn, dni
 
 }
 
-func (tr *TurnRepository) GetByPatientDni(dni string) (*domain.Turn, error) {
+func (tr *TurnRepository) GetByPatientDni(dni string) (*domain.TurnDTO, error) {
 
 	turn, err := tr.Store.GetByPatientDni(dni)
 	if err != nil {

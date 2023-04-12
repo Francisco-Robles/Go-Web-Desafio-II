@@ -8,3 +8,10 @@ type Patient struct {
 	Dni           string `json:"dni"`
 	DischargeDate string `json:"discharge_date"`
 }
+
+type PatientDTO struct {
+	Name	string `json:"name"`
+	Surname string `json:"surname"`
+	Address string `json:"address"`
+	Dni string  `json:"dni"`
+}

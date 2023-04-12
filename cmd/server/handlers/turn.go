@@ -69,9 +69,10 @@ func (th *TurnHandler) GetAll(c *gin.Context) {
 func (th *TurnHandler) Patch(c *gin.Context) {
 
 	type Request struct {
-		Description string
-		PatientId int
-		DentistId int
+		Datetime string `json:"datetime"`
+		Description string `json:"description"`
+		PatientId int `json:"patient_id"`
+		DentistId int `json:"dentist_id"`
 	}
 
 	var r Request
@@ -82,7 +83,7 @@ func (th *TurnHandler) Patch(c *gin.Context) {
 		return
 	}
 
-	update, err := th.TurnService.GetById(id)
+	update, err := th.TurnService.FindById(id)
 	if err != nil {
 		web.NewApiError(c, http.StatusNotFound,"not_found", "turn not found")
 		return
@@ -91,6 +92,10 @@ func (th *TurnHandler) Patch(c *gin.Context) {
 	if err := c.ShouldBindJSON(&r); err != nil {
 		web.NewApiError(c, http.StatusBadRequest,"bad_request", "invalid JSON")
 		return
+	}
+
+	if r.Datetime != "" {
+		update.DateTime = r.Datetime
 	}
 
 	if r.Description != "" {
@@ -125,7 +130,7 @@ func (th *TurnHandler) Put(c *gin.Context) {
 		return
 	}
 
-	_, err = th.TurnService.GetById(id)
+	_, err = th.TurnService.FindById(id)
 	if err != nil {
 		web.NewApiError(c, http.StatusNotFound,"not_found", "turn not found")
 		return
@@ -156,7 +161,7 @@ func (th *TurnHandler) Delete(c *gin.Context) {
 		return
 	}
 
-	_, err = th.TurnService.GetById(id)
+	_, err = th.TurnService.FindById(id)
 	if err != nil {
 		web.NewApiError(c, http.StatusNotFound,"not_found", "turn not found")
 		return

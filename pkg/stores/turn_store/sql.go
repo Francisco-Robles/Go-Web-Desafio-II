@@ -16,8 +16,8 @@ type TurnSqlStore struct {
 
 func (s *TurnSqlStore) Create(t domain.Turn) (*domain.Turn, error) {
 
-	query := "INSERT INTO turns (description, patient_id, dentist_id) VALUES (?,?,?)"
-	result, err := s.DB.Exec(query, t.Description, t.PatientId, t.DentistId)
+	query := "INSERT INTO turns (datetime, description, patient_id, dentist_id) VALUES (?,?,?,?)"
+	result, err := s.DB.Exec(query, t.DateTime, t.Description, t.PatientId, t.DentistId)
 	if err != nil {
 		return nil, err
 	}
@@ -29,6 +29,7 @@ func (s *TurnSqlStore) Create(t domain.Turn) (*domain.Turn, error) {
 
 	turn := &domain.Turn{
 		Id: int(id),
+		DateTime: t.DateTime,
 		Description: t.Description,
 		PatientId: t.PatientId,
 		DentistId: t.DentistId,
@@ -38,15 +39,30 @@ func (s *TurnSqlStore) Create(t domain.Turn) (*domain.Turn, error) {
 
 }
 
-func (s *TurnSqlStore) GetById(id int) (*domain.Turn, error) {
+func (s *TurnSqlStore) GetById(id int) (*domain.TurnDTO, error) {
+
+	var turn domain.TurnDTO
+	//Previamente se crea una View "get_turnDTO" en MySQL
+	query := "SELECT * FROM get_turnDTO WHERE id = ?;"
+	row := s.DB.QueryRow(query, id)
+
+	err := row.Scan(&turn.Id, &turn.DateTime, &turn.Description, &turn.Patient.Name, &turn.Patient.Surname, &turn.Patient.Address, &turn.Patient.Dni, &turn.Dentist.Name, &turn.Dentist.Surname, &turn.Dentist.License)
+	if err != nil {
+		return nil, err
+	}
+
+	return &turn, nil
+
+}
+
+func (s *TurnSqlStore)  FindById(id int)  (*domain.Turn, error) {
 
 	var turn domain.Turn
 
-	query := "SELECT * FROM turns WHERE id = ?;"
+	query := "SELECT * FROM turns WHERE id = ?"
 	row := s.DB.QueryRow(query, id)
 
-	err := row.Scan(&turn.Id, &turn.Description, &turn.PatientId, &turn.DentistId)
-	if err != nil {
+	if err := row.Scan(&turn.Id, &turn.DateTime, &turn.Description, &turn.PatientId, &turn.DentistId); err != nil {
 		return nil, err
 	}
 
@@ -70,7 +86,7 @@ func (s *TurnSqlStore) GetAll() ([]domain.Turn, error) {
 
 		var turn domain.Turn
 
-		err := rows.Scan(&turn.Id, &turn.Description, &turn.PatientId, &turn.DentistId)
+		err := rows.Scan(&turn.Id, &turn.DateTime, &turn.Description, &turn.PatientId, &turn.DentistId)
 		if err != nil {
 			return nil, err
 		}
@@ -85,14 +101,15 @@ func (s *TurnSqlStore) GetAll() ([]domain.Turn, error) {
 
 func (s *TurnSqlStore) UpdateOne(id int, t domain.Turn) (*domain.Turn, error) {
 
-	query := "UPDATE turns SET description = ?, patient_id = ?, dentist_id = ? WHERE id = ?;"
-	_, err := s.DB.Exec(query, t.Description, t.PatientId, t.DentistId, id)
+	query := "UPDATE turns SET datetime = ? description = ?, patient_id = ?, dentist_id = ? WHERE id = ?;"
+	_, err := s.DB.Exec(query, t.DateTime, t.Description, t.PatientId, t.DentistId, id)
 	if err != nil {
 		return nil, err
 	}
 
 	turn := &domain.Turn{
 		Id: id,
+		DateTime: t.DateTime,
 		Description: t.Description,
 		PatientId: t.PatientId,
 		DentistId: t.DentistId,
@@ -104,14 +121,15 @@ func (s *TurnSqlStore) UpdateOne(id int, t domain.Turn) (*domain.Turn, error) {
 
 func (s *TurnSqlStore) UpdateMany(id int, t domain.Turn) (*domain.Turn, error) {
 
-	query := "UPDATE turns SET description = ?, patient_id = ?, dentist_id = ? WHERE id = ?;"
-	_, err := s.DB.Exec(query, t.Description, t.PatientId, t.DentistId, id)
+	query := "UPDATE turns SET datetime = ? description = ?, patient_id = ?, dentist_id = ? WHERE id = ?;"
+	_, err := s.DB.Exec(query, t.DateTime, t.Description, t.PatientId, t.DentistId, id)
 	if err != nil {
 		return nil, err
 	}
 
 	turn := &domain.Turn{
 		Id: id,
+		DateTime: t.DateTime,
 		Description: t.Description,
 		PatientId: t.PatientId,
 		DentistId: t.DentistId,
@@ -145,8 +163,8 @@ func (s *TurnSqlStore) CreateByPatientDniAndDentistLicense(t domain.Turn, dni st
 		return nil, err
 	}
 
-	query := "INSERT INTO turns (description, patient_id, dentist_id) VALUES (?,?,?);"
-	result, err := s.DB.Exec(query, t.Description, idPatient, idDentist)
+	query := "INSERT INTO turns (datetime, description, patient_id, dentist_id) VALUES (?,?,?);"
+	result, err := s.DB.Exec(query, t.DateTime, t.Description, idPatient, idDentist)
 	if err != nil {
 		return nil, err
 	}
@@ -158,6 +176,7 @@ func (s *TurnSqlStore) CreateByPatientDniAndDentistLicense(t domain.Turn, dni st
 
 	turn := &domain.Turn{
 		Id: int(id),
+		DateTime: t.DateTime,
 		Description: t.Description,
 		PatientId: t.PatientId,
 		DentistId: t.DentistId,
@@ -167,19 +186,15 @@ func (s *TurnSqlStore) CreateByPatientDniAndDentistLicense(t domain.Turn, dni st
 
 }
 
-func (s *TurnSqlStore) GetByPatientDni(dni string) (*domain.Turn, error) {
+func (s *TurnSqlStore) GetByPatientDni(dni string) (*domain.TurnDTO, error) {
 
-	var turn domain.Turn
+	var turn domain.TurnDTO
 
-	idPatient, err := s.PatientStore.GetIdByDni(dni)
-	if err != nil {
-		return nil, err
-	}
+	//Previamente se crea una View "get_turnDTO" en MySQL
+	query := "SELECT * FROM get_turnDTO WHERE dni = ?"
+	row := s.DB.QueryRow(query, dni)
 
-	query := "SELECT * FROM turns WHERE patient_id = ?"
-	row := s.DB.QueryRow(query, idPatient)
-
-	err = row.Scan(&turn.Id, &turn.Description, &turn.PatientId, &turn.DentistId)
+	err := row.Scan(&turn.Id, &turn.DateTime, &turn.Description, &turn.Patient.Name, &turn.Patient.Surname, &turn.Patient.Address, &turn.Patient.Dni, &turn.Dentist.Name, &turn.Dentist.Surname, &turn.Dentist.License)
 	if err != nil {
 		return nil, err
 	}
