@@ -11,6 +11,10 @@ type PatientSqlStore struct {
 	DB *sql.DB
 }
 
+func NewPatientSqlStore (db *sql.DB) PatientStoreInterface {
+	return &PatientSqlStore{DB: db}
+}
+
 func (s *PatientSqlStore) Create(p domain.Patient) (*domain.Patient, error) {
 
 	var patient domain.Patient

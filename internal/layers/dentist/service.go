@@ -15,6 +15,10 @@ type DentistService struct {
 	Repository IDentistRepository
 }
 
+func NewDentistService(r IDentistRepository) IDentistService {
+	return &DentistService{Repository: r}
+}
+
 func (ds *DentistService) Create(d domain.Dentist) (*domain.Dentist, error) {
 
 	dentist, err := ds.Repository.Create(d)

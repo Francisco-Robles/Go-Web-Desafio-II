@@ -14,6 +14,10 @@ type DentistHandler struct {
 	DentistService dentist.IDentistService
 }
 
+func NewDentistHandler(s dentist.IDentistService) *DentistHandler {
+	return &DentistHandler{DentistService: s}
+}
+
 func (dh *DentistHandler) Post(c *gin.Context) {
 
 	var dentist domain.Dentist

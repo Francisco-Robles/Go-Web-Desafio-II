@@ -18,6 +18,10 @@ type PatientRepository struct {
 	Store patientstore.PatientStoreInterface
 }
 
+func NewPatientRepository(store patientstore.PatientStoreInterface) IPatientRepository {
+	return &PatientRepository{Store: store}
+}
+
 func (pr *PatientRepository) Create(p domain.Patient) (*domain.Patient, error) {
 
 	patient, err := pr.Store.Create(p)

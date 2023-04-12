@@ -18,6 +18,10 @@ type PatientService struct {
 	Repository IPatientRepository
 }
 
+func NewPatientService(r IPatientRepository) IPatientService {
+	return &PatientService{Repository: r}
+}
+
 func (ps *PatientService) Create(p domain.Patient) (*domain.Patient, error) {
 
 	patient, err := ps.Repository.Create(p)

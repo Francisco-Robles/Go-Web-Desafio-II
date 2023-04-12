@@ -14,6 +14,10 @@ type TurnSqlStore struct {
 	DentistStore dentiststore.DentistStoreInterface
 }
 
+func NewTurnSqlStore (db *sql.DB, PStore patientstore.PatientStoreInterface, DStore dentiststore.DentistStoreInterface) TurnStoreInterface {
+	return &TurnSqlStore{DB: db, PatientStore: PStore, DentistStore: DStore}
+}
+
 func (s *TurnSqlStore) Create(t domain.Turn) (*domain.Turn, error) {
 
 	query := "INSERT INTO turns (datetime, description, patient_id, dentist_id) VALUES (?,?,?,?)"

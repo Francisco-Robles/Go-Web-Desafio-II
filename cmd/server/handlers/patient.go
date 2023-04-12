@@ -14,6 +14,10 @@ type PatientHandler struct {
 	PatientService patient.IPatientService
 }
 
+func NewPatientHandler(s patient.IPatientService) *PatientHandler {
+	return &PatientHandler{PatientService: s}
+}
+
 func (ph *PatientHandler) Post(c *gin.Context) {
 
 	var patient domain.Patient

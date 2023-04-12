@@ -21,6 +21,10 @@ type TurnService struct {
 	Repository ITurnRepository
 }
 
+func NewTurnService(r ITurnRepository) ITurnService {
+	return &TurnService{Repository: r}
+}
+
 func (ts *TurnService) Create(t domain.Turn) (*domain.Turn, error) {
 
 	turn, err := ts.Repository.Create(t)

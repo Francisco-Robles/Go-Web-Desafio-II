@@ -32,20 +32,20 @@ func main() {
 		panic(errPing)
 	}
 
-	dentistStorage := dentiststore.DentistSqlStore{DB: db}
-	dentistRepo := dentist.DentistRepository{Store: &dentistStorage}
-	dentistService := dentist.DentistService{Repository: &dentistRepo}
-	dentistHandler := handlers.DentistHandler{DentistService: &dentistService}
+	dentistStorage := dentiststore.NewDentistSqlStore(db)
+	dentistRepo := dentist.NewDentistRepository(dentistStorage)
+	dentistService := dentist.NewDentistService(dentistRepo)
+	dentistHandler := handlers.NewDentistHandler(dentistService)
 
-	patientStorage := patientstore.PatientSqlStore{DB: db}
-	patientRepo := patient.PatientRepository{Store: &patientStorage}
-	patientService := patient.PatientService{Repository: &patientRepo}
-	patientHandler := handlers.PatientHandler{PatientService: &patientService}
-
-	turnStorage := turnstore.TurnSqlStore{DB: db, PatientStore: &patientStorage, DentistStore: &dentistStorage }
-	turnRepo := turn.TurnRepository{Store: &turnStorage}
-	turnService := turn.TurnService{Repository: &turnRepo}
-	turnHandler := handlers.TurnHandler{TurnService: &turnService}
+	patientStorage := patientstore.NewPatientSqlStore(db)
+	patientRepo := patient.NewPatientRepository(patientStorage)
+	patientService := patient.NewPatientService(patientRepo)
+	patientHandler := handlers.NewPatientHandler(patientService)
+	
+	turnStorage := turnstore.NewTurnSqlStore(db, patientStorage, dentistStorage)
+	turnRepo := turn.NewTurnRepository(turnStorage)
+	turnService := turn.NewTurnService(turnRepo)
+	turnHandler := handlers.NewTurnHandler(turnService)
 	
 	r := gin.New()
 	r.Use(gin.Recovery(), middleware.Authentication(), middleware.Logger())

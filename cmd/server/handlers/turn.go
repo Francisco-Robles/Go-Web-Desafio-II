@@ -15,6 +15,10 @@ type TurnHandler struct {
 	TurnService turn.ITurnService
 }
 
+func NewTurnHandler(s turn.ITurnService) *TurnHandler {
+	return &TurnHandler{TurnService: s}
+}
+
 func (th *TurnHandler) Post(c * gin.Context) {
 
 	var turn domain.Turn

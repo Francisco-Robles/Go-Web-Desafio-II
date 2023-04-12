@@ -22,6 +22,10 @@ type TurnRepository struct {
 	Store turnstore.TurnStoreInterface
 }
 
+func NewTurnRepository(store turnstore.TurnStoreInterface) ITurnRepository {
+	return &TurnRepository{Store: store}
+}
+
 func (tr *TurnRepository) Create(t domain.Turn) (*domain.Turn, error) {
 
 	turn, err := tr.Store.Create(t)

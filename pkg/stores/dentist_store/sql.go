@@ -11,6 +11,10 @@ type DentistSqlStore struct {
 	DB *sql.DB
 }
 
+func NewDentistSqlStore(db *sql.DB) DentistStoreInterface {
+	return &DentistSqlStore{DB: db}
+}
+
 func (s *DentistSqlStore) Create(d domain.Dentist) (*domain.Dentist, error) {
 
 	var dentist domain.Dentist
